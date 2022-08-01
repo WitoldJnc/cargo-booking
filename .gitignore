@@ -1,0 +1,6 @@
+target
+data
+.idea/**
+*.iml
+.m2
+database/mssql/**
