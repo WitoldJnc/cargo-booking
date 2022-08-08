@@ -1,0 +1,205 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="2022_08_08_15_30-1" author="ativanov">
+        <createTable tableName="authority" remarks="Полномочия">
+            <column name="id" type="UUID" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="text" remarks="Наименование полномочия">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text" remarks="Описание полномочия">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2022_08_08_15_30-2" author="ativanov">
+        <createTable tableName="role" remarks="Роли">
+            <column name="id" type="UUID" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="text" remarks="Название роли">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2022_08_08_15_30-3" author="ativanov">
+        <createTable tableName="workspace" remarks="Личные кабинеты">
+            <column name="id" type="UUID" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="text" remarks="Название личного кабинета">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2022_08_08_15_30-4" author="ativanov">
+        <createTable tableName="workspace_role" remarks="Связь ЛК с ролью">
+            <column name="id" type="UUID" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="workspace_id" type="UUID" remarks="Ссылка на ЛК">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="UUID" remarks="Ссылка на роль">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="workspace_role" baseColumnNames="workspace_id"
+                                 constraintName="workspace_role_workspace_id_fkey"
+                                 referencedTableName="workspace"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="workspace_role" baseColumnNames="role_id"
+                                 constraintName="workspace_role_role_id_fkey"
+                                 referencedTableName="role"
+                                 referencedColumnNames="id"/>
+        <addUniqueConstraint tableName="workspace_role" columnNames="workspace_id, role_id"/>
+    </changeSet>
+
+    <changeSet id="2022_08_08_15_30-5" author="ativanov">
+        <createTable tableName="workspace_role_authority" remarks="Связь пары ЛК/роль с полномочием">
+            <column name="workspace_role_id" type="UUID" remarks="Ссылка на ЛК/роль">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority_id" type="UUID" remarks="Ссылка на полномочие">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="workspace_role_authority" baseColumnNames="workspace_role_id"
+                                 constraintName="workspace_role_authority_workspace_role_id_fkey"
+                                 referencedTableName="workspace_role"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="workspace_role_authority" baseColumnNames="authority_id"
+                                 constraintName="workspace_role_authority_authority_id_fkey"
+                                 referencedTableName="authority"
+                                 referencedColumnNames="id"/>
+        <addUniqueConstraint tableName="workspace_role_authority" columnNames="workspace_role_id, authority_id"/>
+    </changeSet>
+
+    <changeSet id="2022_08_08_15_30-6" author="ativanov">
+        <createTable tableName="company" remarks="Компании">
+            <column name="id" type="UUID" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="short_name" type="text" remarks="Краткое наименование">
+                <constraints nullable="false"/>
+            </column>
+            <column name="full_name" type="text" remarks="Полное наименование">
+                <constraints nullable="false"/>
+            </column>
+            <column name="inn" type="text" remarks="ИНН">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kpp" type="text" remarks="КПП">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ogrn" type="text" remarks="ОГРН">
+                <constraints nullable="false"/>
+            </column>
+            <column name="post_address" type="text" remarks="Почтовый адрес">
+                <constraints nullable="false"/>
+            </column>
+            <column name="legal_address" type="text" remarks="Юридический адрес">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text" remarks="Описание">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2022_08_08_15_30-7" author="ativanov">
+        <createTable tableName="participant" remarks="Участник платформы">
+            <column name="id" type="UUID" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="type" type="text" remarks="Тип участника">
+                <constraints nullable="false"/>
+            </column>
+            <column name="company_id" type="UUID" remarks="Ссылка на компанию"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="participant" baseColumnNames="company_id"
+                                 constraintName="participant_company_id_fkey"
+                                 referencedTableName="company"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="2022_08_08_15_30-8" author="ativanov">
+        <createTable tableName="users" remarks="Пользователи">
+            <column name="id" type="UUID" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="email" type="text" remarks="Адрес электронной почты">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="text" remarks="Имя">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="text" remarks="Фамилия">
+                <constraints nullable="false"/>
+            </column>
+            <column name="middle_name" type="text" remarks="Отчество"/>
+            <column name="lang" type="char(2)" remarks="Язык">
+                <constraints nullable="false"/>
+            </column>
+            <column name="blocked" type="boolean" defaultValue="false" remarks="Признак блокировки записи">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="users" columnNames="email"/>
+    </changeSet>
+
+    <changeSet id="2022_08_08_15_30-9" author="ativanov">
+        <createTable tableName="participant_user" remarks="Связь пользователя с участником платформы">
+            <column name="id" type="UUID" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="participant_id" type="UUID" remarks="Ссылка на участника платформы">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID" remarks="Ссылка на пользователя">
+                <constraints nullable="false"/>
+            </column>
+            <column name="administrator" type="boolean" defaultValue="false"
+                    remarks="Является ли пользователь администратором в рамках участника платформы">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="participant_user" baseColumnNames="participant_id"
+                                 constraintName="participant_user_participant_id_fkey"
+                                 referencedTableName="participant"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="participant_user" baseColumnNames="user_id"
+                                 constraintName="participant_user_user_id_fkey"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="2022_08_08_15_30-10" author="ativanov">
+        <createTable tableName="participant_user_workspace_role"
+                     remarks="Связь пользователя участника платформы с ЛК/ролью">
+            <column name="participant_user_id" type="UUID" remarks="Ссылка на пользователя участника платформы">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workspace_role_id" type="UUID" remarks="Ссылка на ЛК/роль">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="participant_user_workspace_role" baseColumnNames="participant_user_id"
+                                 constraintName="participant_user_workspace_role_participant_user_id_fkey"
+                                 referencedTableName="participant_user"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="participant_user_workspace_role" baseColumnNames="workspace_role_id"
+                                 constraintName="participant_user_workspace_role_workspace_role_id_fkey"
+                                 referencedTableName="workspace_role"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

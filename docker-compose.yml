@@ -71,6 +71,52 @@ services:
       - cargo-network
     restart: always
 
+  account-service:
+    build:
+      context: account-service
+    depends_on:
+      - config-server
+      - db
+      - discovery-server
+    environment:
+      ACTIVE_PROFILES: docker
+      CONFIG_SERVER_HOST: config-server
+    image: com/cargo/booking/account-service:0.1
+    networks:
+      - cargo-network
+    restart: always
+
+  auth-server:
+    build:
+      context: auth-server
+    depends_on:
+      - config-server
+      - db
+      - discovery-server
+    environment:
+      ACTIVE_PROFILES: docker
+      CONFIG_SERVER_HOST: config-server
+    image: com/cargo/booking/auth-server:0.1
+    networks:
+      - cargo-network
+    restart: always
+
+  claim-service:
+    build:
+      context: claim-service
+    depends_on:
+      - config-server
+      - db
+      - discovery-server
+      - minio
+    environment:
+      ACTIVE_PROFILES: docker
+      CONFIG_SERVER_HOST: config-server
+    image: com/cargo/booking/claim-service:0.1
+    networks:
+      - cargo-network
+    restart: always
+
   db:
     build:
       context: database

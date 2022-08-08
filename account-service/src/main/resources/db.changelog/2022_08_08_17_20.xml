@@ -1,0 +1,101 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="2022_08_08_17_20-1" author="ativanov">
+        <createTable tableName="system_role" remarks="Системные роли">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="text" remarks="Название роли">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2022_08_08_17_20-2" author="ativanov">
+        <createTable tableName="system_role_authority">
+            <column name="system_role_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="system_role_authority" columnNames="system_role_id, authority_id"/>
+        <addForeignKeyConstraint baseTableName="system_role_authority" baseColumnNames="system_role_id"
+                                 constraintName="system_role_authority_system_role_fk"
+                                 referencedTableName="system_role"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="system_role_authority" baseColumnNames="authority_id"
+                                 constraintName="system_role_authority_authority_fk"
+                                 referencedTableName="authority"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="2022_08_08_17_20-3" author="ativanov">
+        <createTable tableName="users_system_role">
+            <column name="system_role_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="users_system_role" columnNames="system_role_id, user_id"/>
+        <addForeignKeyConstraint baseTableName="users_system_role" baseColumnNames="system_role_id"
+                                 constraintName="users_system_role_system_role_fk"
+                                 referencedTableName="system_role"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="users_system_role" baseColumnNames="user_id"
+                                 constraintName="users_system_role_user_fk"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="2022_08_08_17_20-4" author="ativanov">
+        <insert tableName="system_role">
+            <column name="id">5aaef776-2a1a-4803-9907-cf22468ca646</column>
+            <column name="name">USER</column>
+        </insert>
+        <insert tableName="system_role">
+            <column name="id">473691ad-44fd-4c4e-aa75-2be464fa65b8</column>
+            <column name="name">SUPER_READER</column>
+        </insert>
+        <insert tableName="system_role">
+            <column name="id">9b878081-b655-419b-a798-e1aa52b45d61</column>
+            <column name="name">ADMIN</column>
+        </insert>
+        <insert tableName="system_role">
+            <column name="id">77e592b9-a44d-47e8-a962-9f4c4da11a95</column>
+            <column name="name">DC_SPECIALIST</column>
+        </insert>
+        <insert tableName="system_role">
+            <column name="id">7bfae953-24ac-4620-b74a-ca8d391c82e4</column>
+            <column name="name">NSI_EDITOR</column>
+        </insert>
+    </changeSet>
+
+    <changeSet id="2022_08_08_17_20-5" author="ativanov">
+        <setTableRemarks tableName="settings" remarks="Настройки"/>
+        <setTableRemarks tableName="users_system_role" remarks="Связь пользователя с системной ролью"/>
+        <setTableRemarks tableName="system_role_authority" remarks="Связь системной роли с привилегиями"/>
+    </changeSet>
+
+
+    <changeSet id="2022_08_08_17_20-6" author="ativanov">
+        <preConditions>
+            <columnExists schemaName="public" tableName="company" columnName="logo"/>
+        </preConditions>
+        <dropColumn schemaName="public" tableName="company" columnName="logo"/>
+    </changeSet>
+
+    <changeSet id="2022_08_08_17_20-7" author="ativanov">
+        <addColumn tableName="company" schemaName="public">
+            <column name="logo" type="varchar(128)" remarks="Название логотипа"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

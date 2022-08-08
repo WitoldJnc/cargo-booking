@@ -31,3 +31,21 @@ services:
                   "-cp","app:app/lib/*","com.cargo.booking.nsi.NsiServiceApplication" ]
     ports:
       - "3005:3005"
+
+  account-service:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3006",
+                  "-cp","app:app/lib/*","com.cargo.booking.account.AccountServiceApplication" ]
+    ports:
+      - "3006:3006"
+
+  auth-server:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3007",
+                  "-cp","app:app/lib/*","com.cargo.booking.auth.AuthServerApplication" ]
+    ports:
+      - "3007:3007"
+
+  claim-service:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3008",
+                  "-cp","app:app/lib/*","com.cargo.booking.claim.ClaimServiceApplication" ]
+    ports:
+      - "3008:3008"
