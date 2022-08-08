@@ -1,0 +1,24 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="2022_08_08_15_31-1" author="ativanov">
+        <preConditions onFail="HALT">
+            <tableExists tableName="participant"/>
+        </preConditions>
+        <addColumn tableName="participant">
+            <column name="status" type="varchar(100)" remarks="Статус участника" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="participant" columnName="status"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2022_08_08_15_31-2" author="ativanov">
+        <dropColumn tableName="users" columnName="lang"/>
+    </changeSet>
+</databaseChangeLog>

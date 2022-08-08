@@ -1,0 +1,14 @@
+server:
+  port: 8083
+  shutdown: graceful
+
+spring:
+  application:
+    name: auth-server
+  config:
+    import: configserver:http://${CONFIG_SERVER_HOST:localhost}:8082
+  profiles:
+    active: ${ACTIVE_PROFILES:}
+
+services:
+  account: "account-service"

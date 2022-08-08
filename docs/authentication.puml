@@ -1,0 +1,69 @@
+@startuml
+
+actor User
+autonumber
+== Login ==
+User -> WebClient : clicks `Login`
+WebClient -> ApiGateway : send username/password (/auth-server/login)
+activate WebClient
+ApiGateway -> ApiGateway : check if `Authentication: Basic <value>` exists (filter)
+ApiGateway -> AuthServer : proxy login call
+AuthServer -> Auth : get tokens (/api/token)
+activate AuthServer
+Auth --> AuthServer : tokens/user info
+AuthServer -> AccountService : get user info (/account-service/users/)
+AccountService --> AuthServer : user info
+AuthServer -> AuthServer : generate jwt token
+AuthServer -> TokenCache : store pair `token -> jwt` (ttl =  token lifetime)
+AuthServer -> ApiGateway : tokens
+deactivate AuthServer
+ApiGateway -> WebClient : proxy tokens
+deactivate WebClient
+
+== API call (token OK) ==
+User -> WebClient : clicks `list claims`
+WebClient -> ApiGateway : api call with token (/claim-service/claims)
+activate WebClient
+ApiGateway -> ApiGateway : check if `Authentication: Bearer <value>` exists (filter)
+activate ApiGateway
+ApiGateway -> AuthServer : check  token (/auth-server/check)
+AuthServer -> Auth : check token (/api/token/check)
+activate AuthServer
+Auth --> AuthServer : token OK
+alt jwt token is present
+AuthServer -> TokenCache : get jwt token by  token
+TokenCache --> AuthServer : jwt token
+end
+alt jwt token doesn't exist
+AuthServer -> TokenCache : get jwt token by  token
+TokenCache --> AuthServer : no token
+AuthServer -> AccountService : get user info (/account-service/users/)
+AccountService --> AuthServer : user info
+AuthServer -> AuthServer : generate jwt token
+AuthServer -> TokenCache : store pair `token -> jwt` (ttl ~15min)
+end
+AuthServer -> ApiGateway : jwt token
+deactivate AuthServer
+ApiGateway -> ApiGateway : remove  token, add jwt token
+ApiGateway -> ClaimService : proxy API call (/claim-service/claims)
+deactivate ApiGateway
+ClaimService -> ApiGateway : claims
+ApiGateway -> WebClient : proxy claims
+deactivate WebClient
+
+== API call v2 (no  token verify) ==
+User -> WebClient : clicks `list claims`
+WebClient -> ApiGateway : api call with  token (/claim-service/claims)
+activate WebClient
+ApiGateway -> ApiGateway : check if `Authentication: Bearer <value>` exists (filter)
+activate ApiGateway
+ApiGateway -> TokenCache : get jwt token by  token
+TokenCache --> ApiGateway : jwt token
+ApiGateway -> ApiGateway :  remove token, add jwt token
+ApiGateway -> ClaimService : proxy API call (/claim-service/claims)
+deactivate ApiGateway
+ClaimService -> ApiGateway : claims
+ApiGateway -> WebClient : proxy claims
+deactivate WebClient
+
+@enduml

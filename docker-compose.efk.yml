@@ -52,6 +52,37 @@ services:
         fluentd-async: 'true'
         tag: service.nsi-service
 
+  account-service:
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 127.0.0.1:24225
+        fluentd-async: 'true'
+        tag: service.account-service
+
+  auth-server:
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 127.0.0.1:24225
+        fluentd-async: 'true'
+        tag: service.auth-server
+
+  claim-service:
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 127.0.0.1:24225
+        fluentd-async: 'true'
+        tag: service.claim-service
+
+
   fluentd:
     build: fluentd
     image: dme/cargo/fluentd:0.1
