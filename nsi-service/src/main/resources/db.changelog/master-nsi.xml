@@ -1,0 +1,12 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
+
+    <include file="db/changelog/2022_08_08_13_33_crete_city_country_imp_airport_dictionaries.xml"/>
+    <include file="db/changelog/2022_08_08_13_34_schedule_dictionary.xml"/>
+    <include file="db/changelog/2022_08_08_13_35_imp_dictionary.xml"/>
+    <include file="db/changelog/2022_08_08_13_36_rate_dictionary.xml"/>
+
+</databaseChangeLog>

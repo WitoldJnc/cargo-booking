@@ -1,0 +1,48 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+          uri: lb://nsi-service
+          predicates:
+            - Path=/nsi-service/api/dictionary/country/**
+            - Method=GET
+          filters:
+            - RewritePath=/nsi-service(?<segment>/?.*), $\{segment}
+        - id: airline-dictionary
+          uri: lb://nsi-service
+          predicates:
+            - Path=/nsi-service/api/dictionary/airline/**
+            - Method=GET
+          filters:
+            - RewritePath=/nsi-service(?<segment>/?.*), $\{segment}
+        - id: rate-dictionary
+          uri: lb://nsi-service
+          predicates:
+            - Path=/nsi-service/api/dictionary/rate/**
+            - Method=GET,POST
+          filters:
+            - RewritePath=/nsi-service(?<segment>/?.*), $\{segment}
+        - id: city-dictionary
+          uri: lb://nsi-service
+          predicates:
+            - Path=/nsi-service/api/dictionary/city/**
+            - Method=GET
+          filters:
+            - RewritePath=/nsi-service(?<segment>/?.*), $\{segment}
+        - id: imp-dictionary
+          uri: lb://nsi-service
+          predicates:
+            - Path=/nsi-service/api/dictionary/imp/**
+            - Method=GET
+          filters:
+            - RewritePath=/nsi-service(?<segment>/?.*), $\{segment}
+
+  config:
+    import: configserver:http://${CONFIG_SERVER_HOST:localhost}:8082
+  profiles:
+    active: ${ACTIVE_PROFILES:}

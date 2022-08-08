@@ -1,0 +1,49 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="ativanov" id="1.0.0">
+        <createTable tableName="stored_file">
+            <column name="id" type="UUID" defaultValue="gen_random_uuid()" remarks="Уникальный идентификатор">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="text" remarks="Оригинальное название">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content_length" type="bigint" remarks="Размер файла в байтах">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="claim_file">
+            <column name="claim_id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="claim_file_pk"/>
+            </column>
+            <column name="stored_file_id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="claim_file_pk"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="claim_file"
+                                 baseColumnNames="claim_id"
+                                 referencedTableName="claim"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_claim_file_claim_id"/>
+        <addForeignKeyConstraint baseTableName="claim_file"
+                                 baseColumnNames="stored_file_id"
+                                 referencedTableName="stored_file"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"
+                                 constraintName="fk_claim_file_stored_file_id"/>
+        <rollback>
+            <dropTable tableName="stored_file"/>
+            <dropTable tableName="claim_file"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="ativanov" id="1.0.1">
+        <setTableRemarks tableName="claim_file" remarks="Связь заявки с файлами"/>
+        <setTableRemarks tableName="stored_file" remarks="Файлы"/>
+    </changeSet>
+
+</databaseChangeLog>

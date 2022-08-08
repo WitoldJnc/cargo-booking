@@ -1,0 +1,123 @@
+version: '2.4'
+
+services:
+
+  config-server:
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 127.0.0.1:24225
+        fluentd-async: 'true'
+        tag: service.config-server
+
+  discovery-server:
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 127.0.0.1:24225
+        fluentd-async: 'true'
+        tag: service.discovery-server
+
+  api-gateway:
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 127.0.0.1:24225
+        fluentd-async: 'true'
+        tag: service.api-gateway
+
+  internal-api-gateway:
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 127.0.0.1:24225
+        fluentd-async: 'true'
+        tag: service.internal-api-gateway
+        
+  nsi-service:
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 127.0.0.1:24225
+        fluentd-async: 'true'
+        tag: service.nsi-service
+
+  account-service:
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 127.0.0.1:24225
+        fluentd-async: 'true'
+        tag: service.account-service
+
+  auth-server:
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 127.0.0.1:24225
+        fluentd-async: 'true'
+        tag: service.auth-server
+
+  claim-service:
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 127.0.0.1:24225
+        fluentd-async: 'true'
+        tag: service.claim-service
+
+
+  fluentd:
+    build: fluentd
+    image: dme/cargo/fluentd:0.1
+    networks:
+      - cargo-network
+    depends_on:
+      - elasticsearch
+    ports:
+      - "24225:24225"
+      - "24225:24225/udp"
+
+  elasticsearch:
+    image: elasticsearch:7.13.1
+    networks:
+      - cargo-network
+    environment:
+      - discovery.type=single-node
+    expose:
+      - 9200
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+
+  kibana:
+    image: kibana:7.13.1
+    links:
+      - elasticsearch
+    networks:
+      - cargo-network
+    volumes:
+      - kibana_data:/usr/share/kibana/data
+    ports:
+      - "5601:5601"
+
+volumes:
+  elasticsearch_data:
+  kibana_data:

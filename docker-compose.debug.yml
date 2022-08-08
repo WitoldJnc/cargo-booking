@@ -1,0 +1,51 @@
+version: '2.4'
+
+services:
+
+  config-server:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3001",
+               "-cp","app:app/lib/*","com.cargo.booking.config.ConfigServerApplication" ]
+    ports:
+      - "3001:3001"
+
+  discovery-server:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3002",
+               "-cp","app:app/lib/*","com.cargo.booking.discovery.DiscoveryServerApplication" ]
+    ports:
+      - "3002:3002"
+
+  api-gateway:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3003",
+                  "-cp","app:app/lib/*","com.cargo.booking.gateway.ApiGatewayApplication" ]
+    ports:
+      - "3003:3003"
+
+  internal-api-gateway:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3004",
+                  "-cp","app:app/lib/*","com.cargo.booking.internal.gateway.InternalApiGatewayApplication" ]
+    ports:
+      - "3004:3004"
+      
+  nsi-service:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3005",
+                  "-cp","app:app/lib/*","com.cargo.booking.nsi.NsiServiceApplication" ]
+    ports:
+      - "3005:3005"
+
+  account-service:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3006",
+                  "-cp","app:app/lib/*","com.cargo.booking.account.AccountServiceApplication" ]
+    ports:
+      - "3006:3006"
+
+  auth-server:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3007",
+                  "-cp","app:app/lib/*","com.cargo.booking.auth.AuthServerApplication" ]
+    ports:
+      - "3007:3007"
+
+  claim-service:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3008",
+                  "-cp","app:app/lib/*","com.cargo.booking.claim.ClaimServiceApplication" ]
+    ports:
+      - "3008:3008"

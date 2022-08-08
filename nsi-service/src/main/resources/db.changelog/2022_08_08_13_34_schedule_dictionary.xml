@@ -1,0 +1,135 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="2022_08_08_13_34-1" author="ativanov">
+        <createTable tableName="airline" schemaName="nsi"
+                     remarks="Справочник авиакомпаний">
+            <column name="id" type="uuid" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="airline_code" type="varchar(3)" remarks="Код авиакомпании">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="jsonb" remarks="Название авиакомпании">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_34-2" author="ativanov">
+        <createTable tableName="schedule" schemaName="nsi"
+                     remarks="Справочник расписаний">
+            <column name="id" type="uuid" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="airline_id" type="uuid" remarks="Код авиакомпании">
+                <constraints nullable="false"/>
+            </column>
+            <column name="flight_number" type="varchar(4)" remarks="Номер рейса">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ivi" type="varchar(2)" remarks="Идентификатор изменения маршрута">
+                <constraints nullable="false"/>
+            </column>
+            <column name="leg_sequence_number" type="varchar(2)" remarks="Порядковый номер этапа маршрута">
+                <constraints nullable="false"/>
+            </column>
+            <column name="service_type" type="varchar(1)" remarks="Тип обслуживания">
+                <constraints nullable="false"/>
+            </column>
+            <column name="aircraft_id" type="uuid" remarks="Тип ВС">
+                <constraints nullable="false"/>
+            </column>
+            <column name="period_of_operation_from" type="date" remarks="Период выполнения (начало периода)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="period_of_operation_to" type="date" remarks="Период выполнения (конец периода)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="days_of_operation" type="varchar(7)" remarks="Дни выполнения">
+                <constraints nullable="false"/>
+            </column>
+            <column name="departure_station" type="uuid" remarks="Аэропорт отправления">
+                <constraints nullable="false"/>
+            </column>
+            <column name="departure_time_aircraft_tz" type="time with time zone"
+                    remarks="Планируемое время отправления самолета">
+                <constraints nullable="false"/>
+            </column>
+            <column name="arrival_station" type="uuid" remarks="Аэропорт прибытия">
+                <constraints nullable="false"/>
+            </column>
+            <column name="arrival_time_aircraft" type="time with time zone"
+                    remarks="Планируемое время прибытия самолета">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operational_suffix" type="varchar(1)" remarks="Операционный суффикс"/>
+        </createTable>
+        <rollback>
+            <dropTable tableName="schedule" schemaName="nsi"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_34-3" author="ativanov">
+        <preConditions onFail="HALT">
+            <tableExists tableName="airline" schemaName="nsi"/>
+            <tableExists tableName="schedule" schemaName="nsi"/>
+        </preConditions>
+        <addForeignKeyConstraint baseTableSchemaName="nsi" baseTableName="schedule"
+                                 baseColumnNames="airline_id" referencedTableSchemaName="nsi"
+                                 referencedTableName="airline" referencedColumnNames="id"
+                                 constraintName="fk_schedule_airline_id"/>
+        <rollback>
+            <dropForeignKeyConstraint baseTableSchemaName="nsi" baseTableName="schedule"
+                                      constraintName="fk_schedule_airline_id"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_34-4" author="ativanov">
+        <preConditions onFail="HALT">
+            <tableExists tableName="aircraft" schemaName="nsi"/>
+            <tableExists tableName="schedule" schemaName="nsi"/>
+        </preConditions>
+        <addForeignKeyConstraint baseTableSchemaName="nsi" baseTableName="schedule"
+                                 baseColumnNames="aircraft_id" referencedTableSchemaName="nsi"
+                                 referencedTableName="aircraft" referencedColumnNames="id"
+                                 constraintName="fk_schedule_aircraft_id"/>
+        <rollback>
+            <dropForeignKeyConstraint baseTableSchemaName="nsi" baseTableName="schedule"
+                                      constraintName="fk_schedule_aircraft_id"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_34-5" author="ativanov">
+        <preConditions onFail="HALT">
+            <tableExists tableName="airport" schemaName="nsi"/>
+            <tableExists tableName="schedule" schemaName="nsi"/>
+        </preConditions>
+        <addForeignKeyConstraint baseTableSchemaName="nsi" baseTableName="schedule"
+                                 baseColumnNames="departure_station" referencedTableSchemaName="nsi"
+                                 referencedTableName="airport" referencedColumnNames="id"
+                                 constraintName="fk_schedule_departure_station_airport_id"/>
+        <rollback>
+            <dropForeignKeyConstraint baseTableSchemaName="nsi" baseTableName="schedule"
+                                      constraintName="fk_schedule_departure_station_airport_id"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_34-6" author="ativanov">
+        <preConditions onFail="HALT">
+            <tableExists tableName="airport" schemaName="nsi"/>
+            <tableExists tableName="schedule" schemaName="nsi"/>
+        </preConditions>
+        <addForeignKeyConstraint baseTableSchemaName="nsi" baseTableName="schedule"
+                                 baseColumnNames="arrival_station" referencedTableSchemaName="nsi"
+                                 referencedTableName="airport" referencedColumnNames="id"
+                                 constraintName="fk_schedule_arrival_station_airport_id"/>
+        <rollback>
+            <dropForeignKeyConstraint baseTableSchemaName="nsi" baseTableName="schedule"
+                                      constraintName="fk_schedule_arrival_station_airport_id"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

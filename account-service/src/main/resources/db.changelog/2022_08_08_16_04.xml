@@ -1,0 +1,49 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="2022_08_08_16_04-1" author="ativanov">
+        <dropNotNullConstraint tableName="company" columnName="ogrn"/>
+        <dropNotNullConstraint tableName="company" columnName="description"/>
+        <addColumn tableName="company">
+            <column name="contact_person" type="text" remarks="Контактное лицо">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position" type="text" remarks="Должность">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone" type="text" remarks="Номер телефона"/>
+            <column name="email" type="text" remarks="Адрес электронной почты">
+                <constraints nullable="false"/>
+            </column>
+            <column name="country_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="logo" type="bytea" remarks="Логотип компании"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2022_08_08_16_04-2" author="ativanov">
+        <createTable tableName="settings">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="value" type="jsonb" remarks="Значение настроек">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2022_08_08_16_04-3" author="ativanov">
+        <addColumn tableName="participant">
+            <column name="settings_id" type="uuid"/>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="participant" baseColumnNames="settings_id"
+                                 constraintName="participant_settings_fk"
+                                 referencedTableName="settings"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

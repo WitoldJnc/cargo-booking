@@ -1,0 +1,102 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="2022_08_08_13_36-1" author="ativanov">
+        <preConditions>
+            <not>
+                <tableExists tableName="rate" schemaName="nsi"/>
+            </not>
+        </preConditions>
+        <createTable tableName="rate" schemaName="nsi" remarks="Спраочник тарифов">
+            <column name="id" type="uuid" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="participant_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dt_upload" type="timestamp without time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_name" type="varchar(255)" remarks="Название загружаемого файла">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rate_name" type="varchar(255)" remarks="Наименоание тарифа">
+                <constraints nullable="false"/>
+            </column>
+            <column name="carrier_name" type="varchar(255)" remarks="Имя перевозчика">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dispatch_id" type="uuid" remarks="Место отправления">
+                <constraints nullable="false"/>
+            </column>
+            <column name="arrival_id" type="uuid" remarks="Место прибытия">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transit_station" type="varchar(255)" remarks="Транзитные станции"/>
+            <column name="imp_id" type="uuid" remarks="Коды специальной обработки"/>
+            <column name="currency_id" type="uuid" remarks="Валюта оплаты">
+                <constraints nullable="false"/>
+            </column>
+            <column name="min_weight" type="int4" remarks="Минимальный вес">
+                <constraints nullable="false"/>
+            </column>
+            <column name="less_than_45_kg" type="int4" remarks="До 45кг">
+                <constraints nullable="false"/>
+            </column>
+            <column name="from_46_to_100_kg" type="int4" remarks="От 46 до 100кг">
+                <constraints nullable="false"/>
+            </column>
+            <column name="from_101_to_300_kg" type="int4" remarks="От 101 до 300кг"/>
+            <column name="from_301_to_1000_kg" type="int4" remarks="От 301 до 1000кг"/>
+            <column name="over_1001_kg" type="int4" remarks="Свыше 1001кг"/>
+            <column name="rate_from" type="date" remarks="Дата начала дейстия тарифа">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rate_to" type="date" remarks="Дата окончания действия тарифа">
+                <constraints nullable="false"/>
+            </column>
+            <column name="airbill_cost" type="int4" remarks="Стоимость авианакладной">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment" type="varchar(1000)" remarks="Произвольный комментарий"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_36-2" author="ativanov">
+        <preConditions onFail="HALT">
+            <tableExists tableName="airport" schemaName="nsi"/>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="rate" baseTableSchemaName="nsi" baseColumnNames="dispatch_id"
+                                 referencedTableName="airport" referencedTableSchemaName="nsi" referencedColumnNames="id"
+                                 constraintName="rate_dir_dispartch_id_airport_id"/>
+
+        <addForeignKeyConstraint baseTableName="rate" baseTableSchemaName="nsi" baseColumnNames="arrival_id"
+                                 referencedTableName="airport" referencedTableSchemaName="nsi" referencedColumnNames="id"
+                                 constraintName="rate_dir_arrival_id_airport_id"/>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_36-3" author="ativanov">
+        <preConditions onFail="HALT">
+            <tableExists tableName="imp" schemaName="nsi"/>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="rate" baseTableSchemaName="nsi" baseColumnNames="imp_id"
+                                 referencedTableName="imp" referencedTableSchemaName="nsi" referencedColumnNames="id"
+                                 constraintName="rate_dit_shc_id_shc_id"/>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_36-4" author="ativanov">
+        <preConditions onFail="HALT">
+            <tableExists tableName="currency" schemaName="nsi"/>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="rate" baseTableSchemaName="nsi" baseColumnNames="currency_id"
+                                 referencedTableName="currency" referencedColumnNames="id" referencedTableSchemaName="nsi"
+                                 constraintName="rate_dir_currency_id_currency_id"/>
+    </changeSet>
+
+</databaseChangeLog>
