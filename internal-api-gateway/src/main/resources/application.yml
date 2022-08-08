@@ -1,0 +1,21 @@
+server:
+  port: 9001
+
+spring:
+  application:
+    name: internal-api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: nsi-schedule
+          uri: lb://nsi-service
+          predicates:
+            - Path=/nsi-service/internal/api/schedule/**
+            - Method=GET,POST
+          filters:
+            - RewritePath=/nsi-service(?<segment>/?.*), $\{segment}
+
+  config:
+    import: configserver:http://${CONFIG_SERVER_HOST:localhost}:8082
+  profiles:
+    active: ${ACTIVE_PROFILES:}
