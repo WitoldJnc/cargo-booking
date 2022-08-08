@@ -24,6 +24,21 @@ services:
       - "8761:8761"
     restart: always
 
+  nsi-service:
+    build:
+      context: nsi-service
+    depends_on:
+      - config-server
+      - db
+      - discovery-server
+    environment:
+      ACTIVE_PROFILES: docker
+      CONFIG_SERVER_HOST: config-server
+    image: com/cargo/booking/nsi-service:0.1
+    networks:
+      - cargo-network
+    restart: always
+
   db:
     build:
       context: database
