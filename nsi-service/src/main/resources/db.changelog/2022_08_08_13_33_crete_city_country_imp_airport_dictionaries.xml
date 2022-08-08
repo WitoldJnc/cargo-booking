@@ -1,0 +1,151 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="2022_08_08_13_33-1" author="ativanov">
+        <sql dbms="postgresql">
+            CREATE SCHEMA nsi;
+        </sql>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_33-2" author="ativanov">
+        <preConditions>
+            <not>
+                <tableExists tableName="aircraft" schemaName="nsi"/>
+            </not>
+        </preConditions>
+        <createTable tableName="aircraft" schemaName="nsi" remarks="Типы воздушных судов">
+            <column name="id" type="uuid" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="type" type="jsonb" remarks="Тип ВС">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type_iata" type="varchar(3)" remarks="Тип ВС по классификации IATA">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_33-3" author="ativanov">
+        <preConditions>
+            <not>
+                <tableExists tableName="currency" schemaName="nsi"/>
+            </not>
+        </preConditions>
+        <createTable tableName="currency" schemaName="nsi" remarks="Валюта">
+            <column name="id" type="uuid" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="symbol" type="varchar(15)" remarks="Спец символ валюты">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_33-4" author="ativanov">
+        <preConditions>
+            <not>
+                <tableExists tableName="country" schemaName="nsi"/>
+            </not>
+        </preConditions>
+        <createTable tableName="country" schemaName="nsi" remarks="Страны">
+            <column name="id" type="uuid" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="jsonb">
+                <constraints nullable="false"/>
+            </column>
+            <column name="currency_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_33-5" author="ativanov">
+        <preConditions>
+            <tableExists tableName="currency" schemaName="nsi"/>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="country" baseTableSchemaName="nsi" baseColumnNames="currency_id"
+                                 referencedTableName="currency" referencedTableSchemaName="nsi" referencedColumnNames="id"
+                                 constraintName="fk_country_currency_id_currency_id"/>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_33-6" author="ativanov">
+        <preConditions>
+            <not>
+                <tableExists tableName="city" schemaName="nsi"/>
+            </not>
+        </preConditions>
+        <createTable tableName="city" schemaName="nsi" remarks="Города">
+            <column name="id" type="uuid" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="country_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="jsonb">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_33-7" author="ativanov">
+        <preConditions>
+            <tableExists tableName="country" schemaName="nsi"/>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="city" baseTableSchemaName="nsi" baseColumnNames="country_id"
+                                 referencedTableName="country" referencedTableSchemaName="nsi" referencedColumnNames="id"
+                                 constraintName="fk_city_country_id_country_id"/>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_33-8" author="ativanov">
+        <preConditions>
+            <not>
+                <tableExists tableName="airport" schemaName="nsi"/>
+            </not>
+        </preConditions>
+        <createTable tableName="airport" schemaName="nsi" remarks="Аэропорты">
+            <column name="id" type="uuid" defaultValue="gen_random_uuid()">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="country_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="city_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="jsonb">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_33-9" author="ativanov">
+        <preConditions>
+            <tableExists tableName="country" schemaName="nsi"/>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="airport" baseTableSchemaName="nsi" baseColumnNames="country_id"
+                                 referencedTableName="country" referencedTableSchemaName="nsi" referencedColumnNames="id"
+                                 constraintName="fk_airport_country_id_country_id"
+        />
+    </changeSet>
+
+    <changeSet id="2022_08_08_13_33-10" author="ativanov">
+        <preConditions>
+            <tableExists tableName="city" schemaName="nsi"/>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="airport" baseTableSchemaName="nsi" baseColumnNames="city_id"
+                                 referencedTableName="city" referencedTableSchemaName="nsi" referencedColumnNames="id"
+                                 constraintName="fk_airport_city_id_city_id"
+        />
+    </changeSet>
+</databaseChangeLog>
