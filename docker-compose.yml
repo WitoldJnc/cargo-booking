@@ -24,6 +24,38 @@ services:
       - "8761:8761"
     restart: always
 
+  internal-api-gateway:
+    build:
+      context: internal-api-gateway
+    depends_on:
+      - config-server
+      - discovery-server
+    environment:
+      ACTIVE_PROFILES: docker
+      CONFIG_SERVER_HOST: config-server
+    image: com/cargo/booking/internal-api-gateway:0.1
+    networks:
+      - cargo-network
+    ports:
+      - "9001:9001"
+    restart: always
+
+  api-gateway:
+    build:
+      context: api-gateway
+    depends_on:
+      - config-server
+      - discovery-server
+    environment:
+      ACTIVE_PROFILES: docker
+      CONFIG_SERVER_HOST: config-server
+    image: com/cargo/booking/api-gateway:0.1
+    networks:
+      - cargo-network
+    ports:
+      - "8081:8081"
+    restart: always
+    
   nsi-service:
     build:
       context: nsi-service

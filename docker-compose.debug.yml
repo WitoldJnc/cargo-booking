@@ -14,8 +14,20 @@ services:
     ports:
       - "3002:3002"
 
-  nsi-service:
+  api-gateway:
     entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3003",
-                  "-cp","app:app/lib/*","com.cargo.booking.nsi.NsiServiceApplication" ]
+                  "-cp","app:app/lib/*","com.cargo.booking.gateway.ApiGatewayApplication" ]
     ports:
       - "3003:3003"
+
+  internal-api-gateway:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3004",
+                  "-cp","app:app/lib/*","com.cargo.booking.internal.gateway.InternalApiGatewayApplication" ]
+    ports:
+      - "3004:3004"
+      
+  nsi-service:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3005",
+                  "-cp","app:app/lib/*","com.cargo.booking.nsi.NsiServiceApplication" ]
+    ports:
+      - "3005:3005"
