@@ -1,0 +1,51 @@
+version: '2.4'
+
+services:
+
+  config-server:
+    build:
+      context: config-server
+    image: com/cargo/booking/config-server:0.1
+    networks:
+      - cargo-booking-network
+    ports:
+      - "8082:8082"
+    restart: always
+
+  discovery-server:
+    build:
+      context: discovery-server
+    depends_on:
+      - config-server
+    image: com/cargo/booking/discovery-server:0.1
+    networks:
+      - cargo-booking-network
+    ports:
+      - "8761:8761"
+    restart: always
+
+  db:
+    build:
+      context: database
+    image: com/cargo/booking/pg-sql-server:0.1
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_PASSWORD: 'postgres'
+      PG_DATABASE: cargo
+      PG_USER: cargo
+      PG_PASSWORD: 'postgres'
+      PG_TIMEZONE: 'Asia/Yekaterinburg'
+    networks:
+      - cargo-booking-network
+    restart: always
+
+networks:
+  cargo-booking-network:
+    driver: bridge
+
+volumes:
+  db_data:
+

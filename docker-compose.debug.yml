@@ -1,0 +1,15 @@
+version: '2.4'
+
+services:
+
+  config-server:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3001",
+               "-cp","app:app/lib/*","com.cargo.booking.config.ConfigServerApplication" ]
+    ports:
+      - "3001:3001"
+
+  discovery-server:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3002",
+               "-cp","app:app/lib/*","com.cargo.booking.discovery.DiscoveryServerApplication" ]
+    ports:
+      - "3002:3002"
