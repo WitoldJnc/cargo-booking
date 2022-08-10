@@ -25,10 +25,10 @@ public class S3Client implements ApplicationRunner {
     private final String bucket;
 
     public S3Client(
-            @Value("${dme.cargo.s3.server_endpoint}") String serverEndpoint,
-            @Value("${dme.cargo.s3.login}") String login,
-            @Value("${dme.cargo.s3.password}") String password,
-            @Value("${dme.cargo.s3.bucket}") String bucket
+            @Value("${cargo.booking.s3.server_endpoint}") String serverEndpoint,
+            @Value("${cargo.booking.s3.login}") String login,
+            @Value("${cargo.booking.s3.password}") String password,
+            @Value("${cargo.booking.s3.bucket}") String bucket
     ) {
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setSignerOverride(SIGNATURE_ALGORITHM);

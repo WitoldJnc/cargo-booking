@@ -20,7 +20,7 @@ public class ChangePasswordService {
 
     private final AccountServiceClient accountServiceClient;
 
-    private final AuthenticationService dmeAuthenticationService;
+    private final AuthenticationService authenticationService;
 
     public ServiceMessage sendRecoveryCodeTo(String email) {
         Optional<UserDto> userByEmail = accountServiceClient.findUserByEmail(email, LocaleContextHolder.getLocale().getLanguage());
@@ -29,12 +29,12 @@ public class ChangePasswordService {
         } else if (userByEmail.get().getBlocked()) {
             throw new ServiceException(new ServiceMessage("pass_change.user_is_blocked"));
         }
-        dmeAuthenticationService.sendRecoveryCode(email);
+        authenticationService.sendRecoveryCode(email);
         return new ServiceMessage("verification_code_sent");
     }
 
     public ServiceMessage recoverPassword(RecoveryPasswordDto requestDto) {
-        dmeAuthenticationService.changePasswordByCode(requestDto.getEmail(), requestDto.getNewPassword(), requestDto.getEmail());
+        authenticationService.changePasswordByCode(requestDto.getEmail(), requestDto.getNewPassword(), requestDto.getEmail());
         return new ServiceMessage("pass_change.password_successfully_changed");
     }
 
@@ -42,7 +42,7 @@ public class ChangePasswordService {
         if (requestDto.getOldPassword().equals(requestDto.getNewPassword())) {
             throw new ServiceException(new ServiceMessage("pass_change.new_password_equals_an_old_password"));
         }
-        dmeAuthenticationService.changePassword(requestDto.getNewPassword(), requestDto.getOldPassword(), email);
+        authenticationService.changePassword(requestDto.getNewPassword(), requestDto.getOldPassword(), email);
         return new ServiceMessage("pass_change.password_successfully_changed");
     }
 }

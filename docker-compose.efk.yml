@@ -52,6 +52,17 @@ services:
         fluentd-async: 'true'
         tag: service.nsi-service
 
+  calculate-service:
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: 127.0.0.1:24225
+        fluentd-async: 'true'
+        tag: service.calculate-service
+
+
   account-service:
     links:
       - fluentd
@@ -85,7 +96,7 @@ services:
 
   fluentd:
     build: fluentd
-    image: dme/cargo/fluentd:0.1
+    image: com/cargo/booking/fluentd:0.1
     networks:
       - cargo-network
     depends_on:

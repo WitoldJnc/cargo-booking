@@ -20,14 +20,14 @@ public class RegistrationService {
     private static final String LOG_TEMPLATE = "[{}] {}";
     private final UserMapper userMapper;
     private final AccountServiceClient accountServiceClient;
-    private final AuthenticationService dmeAuthenticationService;
+    private final AuthenticationService authenticationService;
 
     public ServiceMessage sendVerificationCodeTo(String email) {
         boolean emailExists = accountServiceClient.checkUserExistenceByEmail(email, LocaleContextHolder.getLocale().getLanguage());
         if (emailExists) {
             throw new ServiceException(new ServiceMessage("register.email_exists"));
         }
-        dmeAuthenticationService.sendVerificationCode(email);
+        authenticationService.sendVerificationCode(email);
         return new ServiceMessage("register.verification_code_sent");
     }
 
@@ -39,7 +39,7 @@ public class RegistrationService {
         if (emailExists) {
             throw new ServiceException(new ServiceMessage("register.email_exists"));
         }
-        dmeAuthenticationService.register(dto.getEmail(), dto.getPassword(), dto.getVerificationCode());
+        authenticationService.register(dto.getEmail(), dto.getPassword(), dto.getVerificationCode());
         accountServiceClient.createNewUser(userMapper.userRegistrationDtoToNewUserDto(dto), language);
         return new ServiceMessage("register.user_is_registered", dto.getEmail());
     }
