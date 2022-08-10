@@ -49,3 +49,9 @@ services:
                   "-cp","app:app/lib/*","com.cargo.booking.claim.ClaimServiceApplication" ]
     ports:
       - "3008:3008"
+
+  calculate-service:
+    entrypoint: [ "java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3009",
+                  "-cp","app:app/lib/*","com.cargo.booking.calculate.CalculateServiceApplication" ]
+    ports:
+      - "3009:3009"
