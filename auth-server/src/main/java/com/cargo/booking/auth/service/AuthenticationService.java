@@ -3,7 +3,6 @@ package com.cargo.booking.auth.service;
 import com.cargo.booking.auth.client.AccountServiceClient;
 import com.cargo.booking.auth.dto.ParticipantWorkspaceToken;
 import com.cargo.booking.auth.dto.Token;
-import com.cargo.booking.auth.dto.user.ParticipantDto;
 import com.cargo.booking.auth.dto.user.ParticipantUserDto;
 import com.cargo.booking.auth.dto.user.UserDto;
 import com.cargo.booking.auth.dto.user.WorkspaceRoleDto;
@@ -29,13 +28,13 @@ public class AuthenticationService {
 
     private static final String LOG_TEMPLATE = "[{}] {}";
     private final JwtAuthUtils jwtAuthUtils;
-    private final com.cargo.booking.auth.external.AuthenticationService dmeAuthenticationService;
+    private final com.cargo.booking.auth.external.AuthenticationService authenticationService;
     private final AccountServiceClient accountServiceClient;
 
     public Token authenticate(String username, String password) {
         try {
-            AuthToken dmeToken = dmeAuthenticationService.login(username, password);
-            Token token = authenticateInternal(username, dmeToken);
+            AuthToken authToken = authenticationService.login(username, password);
+            Token token = authenticateInternal(username, authToken);
             return token;
         } catch (InvalidCredentialsException ex) {
             throw new ServiceException(new ServiceMessage("auth.invalid_credentials", username));
@@ -64,17 +63,17 @@ public class AuthenticationService {
 
     public Token renewAuthentication(String username, String refreshToken) {
         try {
-            AuthToken dmeToken = dmeAuthenticationService.refresh(username, refreshToken);
-            return authenticateInternal(username, dmeToken);
+            AuthToken token = authenticationService.refresh(username, refreshToken);
+            return authenticateInternal(username, token);
         } catch (InvalidCredentialsException ex) {
             throw new ServiceException(new ServiceMessage("auth.invalid_credentials", username));
         }
     }
 
-    public Token authenticateInternal(String username, AuthToken dmeToken) {
+    public Token authenticateInternal(String username, AuthToken token) {
         UserDto user = getUser(username);
-        String accessToken = jwtAuthUtils.generateAccessToken(username, user.getSystemAuthorities(), dmeToken.getTokenLifeTime());
-        return new Token(username, accessToken, dmeToken.getRefreshToken(), user);
+        String accessToken = jwtAuthUtils.generateAccessToken(username, user.getSystemAuthorities(), token.getTokenLifeTime());
+        return new Token(username, accessToken, token.getRefreshToken(), user);
     }
 
     public ServiceMessage validateToken(String requestTokenHeader) {

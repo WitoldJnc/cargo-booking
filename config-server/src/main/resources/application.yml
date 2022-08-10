@@ -6,3 +6,10 @@ spring:
     name: config-server
   profiles:
     active: ${ACTIVE_PROFILES:native}
+  cloud:
+    config:
+      server:
+        vault:
+          kv-version: 2
+          authentication: TOKEN
+          token: ${VAULT_TOKEN:}

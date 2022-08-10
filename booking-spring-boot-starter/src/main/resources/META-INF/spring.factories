@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.cargo.booking.starter.jwt.JwtConfiguration,dme.cargo.starter.swagger.SwaggerUIConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.cargo.booking.starter.jwt.JwtConfiguration,com.cargo.booking.starter.swagger.SwaggerUIConfiguration

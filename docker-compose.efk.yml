@@ -85,7 +85,7 @@ services:
 
   fluentd:
     build: fluentd
-    image: dme/cargo/fluentd:0.1
+    image: com/cargo/booking/fluentd:0.1
     networks:
       - cargo-network
     depends_on:
