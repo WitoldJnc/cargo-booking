@@ -1,5 +1,3 @@
-# DME CargoCom Backend
-
 ### Первоначальные настройки
 
 Необходимо установить в maven репозиторий стартер `booking-spring-boot-starter`

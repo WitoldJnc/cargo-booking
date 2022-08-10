@@ -18,7 +18,7 @@ public class UserRegistrationDto {
 
     private String middleName;
 
-    @Email(regexp = ".+[@].+[\\.].+", message = "{dme.invalid_email}")
+    @Email(regexp = ".+[@].+[\\.].+", message = "{invalid_email}")
     @NotEmpty(message = "{empty_email}")
     private String email;
 

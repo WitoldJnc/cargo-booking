@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.cargo.booking.auth.exception.InternalServerErrorException;
 import com.cargo.booking.auth.exception.InvalidCredentialsException;
-import com.cargo.booking.auth.exception.UnknownDmeResponseCodeException;
+import com.cargo.booking.auth.exception.UnknownResponseCodeException;
 import com.cargo.booking.auth.external.dto.AuthServerError;
 import com.cargo.booking.auth.external.dto.AuthServerResponse;
 import com.cargo.booking.auth.external.dto.AuthToken;
@@ -35,10 +35,10 @@ public class AuthenticationService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     @Value("${auth.token}")
-    private String dmeAuthToken;
+    private String authToken;
 
     @Value("${auth.host}")
-    private String dmeAuthHost;
+    private String authHost;
 
     public AuthenticationService(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
@@ -47,23 +47,23 @@ public class AuthenticationService {
 
     public AuthToken login(String username, String password) throws InvalidCredentialsException {
         HttpEntity<MultiValueMap<String, String>> request = createAuthRequestEntity(username, password);
-        ResponseEntity<AuthToken> dmeResponse = executePostRequest(dmeAuthHost + "/api/token", request, AuthToken.class);
-        return dmeResponse.getBody();
+        ResponseEntity<AuthToken> response = executePostRequest(authHost + "/api/token", request, AuthToken.class);
+        return response.getBody();
     }
 
     public AuthToken refresh(String username, String refreshToken) {
         HttpEntity<MultiValueMap<String, String>> request = createAuthRequestEntity(username, refreshToken);
-        ResponseEntity<AuthToken> dmeResponse = executePostRequest(dmeAuthHost + "/api/token", request, AuthToken.class);
-        return dmeResponse.getBody();
+        ResponseEntity<AuthToken> response = executePostRequest(authHost + "/api/token", request, AuthToken.class);
+        return response.getBody();
     }
 
     public void sendVerificationCode(String email) {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>(1);
         body.add("email", email);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, getCommonHeaders());
-        AuthServerResponse response = executePostRequest(dmeAuthHost + "/api/RegisterRequest", request, AuthServerResponse.class)
+        AuthServerResponse response = executePostRequest(authHost + "/api/RegisterRequest", request, AuthServerResponse.class)
                 .getBody();
-        processDmeResponse(response, email);
+        processResponse(response, email);
     }
 
     public void register(String email, String password, String verificationCode) {
@@ -72,18 +72,18 @@ public class AuthenticationService {
         body.add("Pass", password);
         body.add("VerifCode", verificationCode);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, getCommonHeaders());
-        AuthServerResponse response = executePostRequest(dmeAuthHost + "/api/RegisterDmeUser", request, AuthServerResponse.class)
+        AuthServerResponse response = executePostRequest(authHost + "/api/RegisterUser", request, AuthServerResponse.class)
                 .getBody();
-        processDmeResponse(response, email);
+        processResponse(response, email);
     }
 
     public void sendRecoveryCode(String email) {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>(1);
         body.add("email", email);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, getCommonHeaders());
-        AuthServerResponse response = executePostRequest(dmeAuthHost + "/api/PassRecoveryRequest", request, AuthServerResponse.class)
+        AuthServerResponse response = executePostRequest(authHost + "/api/PassRecoveryRequest", request, AuthServerResponse.class)
                 .getBody();
-        processDmeResponse(response, email);
+        processResponse(response, email);
     }
 
     public void changePasswordByCode(String email, String newPassword, String verificationCode) {
@@ -92,9 +92,9 @@ public class AuthenticationService {
         body.add("pass", newPassword);
         body.add("VerifCode", verificationCode);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, getCommonHeaders());
-        AuthServerResponse response = executePostRequest(dmeAuthHost + "/api/PassRecovery", request, AuthServerResponse.class)
+        AuthServerResponse response = executePostRequest(authHost + "/api/PassRecovery", request, AuthServerResponse.class)
                 .getBody();
-        processDmeResponse(response, email);
+        processResponse(response, email);
     }
 
     public void changePassword(String newPassword, String oldPassword, String email) {
@@ -103,12 +103,12 @@ public class AuthenticationService {
         body.add("pass", newPassword);
         body.add("oldPass", oldPassword);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, getCommonHeaders());
-        AuthServerResponse response = executePostRequest(dmeAuthHost + "/api/PassChange", request, AuthServerResponse.class)
+        AuthServerResponse response = executePostRequest(authHost + "/api/PassChange", request, AuthServerResponse.class)
                 .getBody();
-        processDmeResponse(response, email);
+        processResponse(response, email);
     }
 
-    private void processDmeResponse(AuthServerResponse response, String email) {
+    private void processResponse(AuthServerResponse response, String email) {
         if (response != null && !response.isSuccess()) {
             switch (response.getCode()) {
                 case INVALID_VERIFICATION_CODE_RESPONSE_CODE -> {
@@ -125,7 +125,7 @@ public class AuthenticationService {
                 }
                 default -> {
                     String message = "Unknown response code: " + response.getCode();
-                    throw new UnknownDmeResponseCodeException(message);
+                    throw new UnknownResponseCodeException(message);
                 }
             }
         }
@@ -141,7 +141,7 @@ public class AuthenticationService {
 
     private MultiValueMap<String, String> getCommonHeaders() {
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>(1);
-        headers.add("Authentication", dmeAuthToken);
+        headers.add("Authentication", authToken);
         return headers;
     }
 
@@ -151,10 +151,10 @@ public class AuthenticationService {
         } catch (HttpClientErrorException ex) {
             if (ex.getRawStatusCode() == 400) {
                 try {
-                    AuthServerError dmeError = objectMapper.readValue(ex.getResponseBodyAsString(), AuthServerError.class);
-                    throw new InvalidCredentialsException(dmeError.getErrorDescription(), ex);
+                    AuthServerError error = objectMapper.readValue(ex.getResponseBodyAsString(), AuthServerError.class);
+                    throw new InvalidCredentialsException(error.getErrorDescription(), ex);
                 } catch (JsonProcessingException e) {
-                    String errorMessage = "Не удалось разобрать сообщение с ошибкой от сервиса аутентификации DME";
+                    String errorMessage = "Не удалось разобрать сообщение с ошибкой от сервиса аутентификации";
                     log.error(errorMessage, e);
                     throw new InternalServerErrorException(errorMessage, e);
                 }
@@ -162,7 +162,7 @@ public class AuthenticationService {
                 throw ex;
             }
         } catch (HttpServerErrorException ex) {
-            String errorMessage = "Внутренняя ошибка сервера аутентификации DME";
+            String errorMessage = "Внутренняя ошибка сервера аутентификации";
             throw new InternalServerErrorException(errorMessage, ex);
         }
     }

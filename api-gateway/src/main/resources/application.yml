@@ -41,6 +41,13 @@ spring:
             - Method=GET
           filters:
             - RewritePath=/nsi-service(?<segment>/?.*), $\{segment}
+        - id: calculate-offers
+          uri: lb://calculate-service
+          predicates:
+            - Path=/calculate-service/api/calculate/offers/**
+            - Method=POST
+          filters:
+            - RewritePath=/calculate-service(?<segment>/?.*), $\{segment}
 
   config:
     import: configserver:http://${CONFIG_SERVER_HOST:localhost}:8082
