@@ -1,0 +1,15 @@
+server:
+  port: ${SERVER_PORT:9005}
+  shutdown: graceful
+
+spring:
+  application:
+    name: calculate-service
+  config:
+    import: configserver:http://${CONFIG_SERVER_HOST:localhost}:8082
+  profiles:
+    active: ${ACTIVE_PROFILES:}
+
+services:
+  nsi: "nsi-service"
+  account: "account-service"

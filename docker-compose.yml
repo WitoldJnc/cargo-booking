@@ -24,6 +24,21 @@ services:
       - "8761:8761"
     restart: always
 
+  calculate-service:
+    build:
+      context: calculate-service
+    depends_on:
+      - config-server
+      - db
+      - discovery-server
+    environment:
+      ACTIVE_PROFILES: docker
+      CONFIG_SERVER_HOST: config-server
+    image: com/cargo/booking/calculate-service:0.1
+    networks:
+      - cargo-network
+    restart: always
+
   internal-api-gateway:
     build:
       context: internal-api-gateway
